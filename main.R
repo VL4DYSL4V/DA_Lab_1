@@ -18,7 +18,13 @@ buildFrequencyPolygons <- function() {
     data = airTrafficCargoStatistics,
     geom = 'freqpoly'
   )
-  return(list(activityPeriod, cargoWeightLBS, cargoMetricTons))
+  return(
+    list(
+      activityPeriod = activityPeriod,
+      cargoWeightLBS = cargoWeightLBS,
+      cargoMetricTons = cargoMetricTons
+    )
+  )
 }
 
 bultWhiskersAndBoxes <- function() {
@@ -46,8 +52,55 @@ bultWhiskersAndBoxes <- function() {
       breaks = trans_breaks("log2", function(x) 2^x),
       labels = trans_format("log2", math_format(2^.x))
     )
-  return(list(activityPeriod, cargoWeightLBS, cargoMetricTons))
+  return(
+    list(
+      activityPeriod = activityPeriod,
+      cargoWeightLBS = cargoWeightLBS,
+      cargoMetricTons = cargoMetricTons
+    )
+  )
+}
+
+printMinMaxQuantils <- function () {
+  summary(
+    airTrafficCargoStatistics[
+      c('Activity.Period', 'Cargo.Weight.LBS', 'Cargo.Metric.TONS')
+    ]
+  )
+}
+
+getDeciles <- function () {
+  activityPeriodDecils <- quantile(
+    airTrafficCargoStatistics$Activity.Period,
+    probs = seq(.1, .9, by = .1)
+  )
+  cargoWeightLBSDecils <- quantile(
+    airTrafficCargoStatistics$Cargo.Weight.LBS,
+    probs = seq(.1, .9, by = .1)
+  )
+  cargoMetricWeightTonsDecils <- quantile(
+    airTrafficCargoStatistics$Cargo.Metric.TONS,
+    probs = seq(.1, .9, by = .1)
+  )
+  return(
+    list(
+      activityPeriodDecils = activityPeriodDecils,
+      cargoWeightLBSDecils = cargoWeightLBSDecils,
+      cargoMetricWeightTonsDecils = cargoMetricWeightTonsDecils
+    )
+  )
 }
 
 buildFrequencyPolygons()
 bultWhiskersAndBoxes()
+
+printMinMaxQuantils()
+
+decils <- getDeciles()
+print("'Activity Period' Decils:")
+print(decils$activityPeriodDecils)
+print("'Cargo Weight LBS' Decils:")
+print(decils$cargoWeightLBSDecils)
+print("'Cargo Weight Tons' Decils:")
+print(decils$cargoMetricWeightTonsDecils)
+
