@@ -1,6 +1,16 @@
 library(ggplot2)
+library("psych")
+library("DescTools")
 
 airTrafficCargoStatistics <- read.csv('Air_Traffic_Cargo_Statistics.csv')
+
+printDelimiter <- function () {
+  cat("\n=========================================================================\n")
+}
+
+printDelimiterWithNewLines <- function () {
+  cat("\n\n=========================================================================\n\n")
+}
 
 buildFrequencyPolygons <- function() {
   activityPeriod <- qplot(
@@ -61,7 +71,7 @@ bultWhiskersAndBoxes <- function() {
   )
 }
 
-printMinMaxQuantils <- function () {
+printMinMaxMeanQuartils <- function () {
   summary(
     airTrafficCargoStatistics[
       c('Activity.Period', 'Cargo.Weight.LBS', 'Cargo.Metric.TONS')
@@ -91,10 +101,36 @@ getDeciles <- function () {
   )
 }
 
+printGeometricalMeanWithoutZeroes <- function (vector, name) {
+  print(
+    paste(
+      "Geometric Mean of '", name, "': ", exp(mean(log(vector[vector>0])))
+    )
+  )
+}
+
+printHarmonicMeanWithoutZeroes <- function (vector, name) {
+  print(
+    paste(
+      "Harmonic Mean of '", name, "': ", harmonic.mean(vector, zero = FALSE)
+    )
+  )
+}
+
+printMode <- function (vector, name) {
+  vectorMode <- Mode(vector)
+  print(
+    paste(
+      "Mode of '", name, "': ", toString(vectorMode)
+    )
+  )
+}
+
 buildFrequencyPolygons()
 bultWhiskersAndBoxes()
 
-printMinMaxQuantils()
+printMinMaxMeanQuartils()
+printDelimiterWithNewLines()
 
 decils <- getDeciles()
 print("'Activity Period' Decils:")
@@ -103,4 +139,19 @@ print("'Cargo Weight LBS' Decils:")
 print(decils$cargoWeightLBSDecils)
 print("'Cargo Weight Tons' Decils:")
 print(decils$cargoMetricWeightTonsDecils)
+printDelimiterWithNewLines()
 
+printGeometricalMeanWithoutZeroes(airTrafficCargoStatistics$Activity.Period, "Activity Period")
+printHarmonicMeanWithoutZeroes(airTrafficCargoStatistics$Activity.Period, "Activity Period")
+printMode(airTrafficCargoStatistics$Activity.Period, "Activity Period")
+printDelimiter()
+
+printGeometricalMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
+printHarmonicMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
+printMode(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
+printDelimiter()
+
+printGeometricalMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
+printHarmonicMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
+printMode(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
+printDelimiter()
