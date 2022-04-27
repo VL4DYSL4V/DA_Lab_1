@@ -47,22 +47,12 @@ bultWhiskersAndBoxes <- function() {
     data = dataHospital,
     aes(y = trestbps)
   ) +
-    geom_boxplot() +
-    scale_y_continuous(
-      trans = log2_trans(),
-      breaks = trans_breaks("log2", function(x) 2^x),
-      labels = trans_format("log2", math_format(2^.x))
-    )
+    geom_boxplot()
   chol <- ggplot(
     data = dataHospital,
     aes(y = chol)
   ) +
-    geom_boxplot() +
-    scale_y_continuous(
-      trans = log2_trans(),
-      breaks = trans_breaks("log2", function(x) 2^x),
-      labels = trans_format("log2", math_format(2^.x))
-    )
+    geom_boxplot()
   return(
     list(
       age = age,
