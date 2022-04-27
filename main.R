@@ -1,6 +1,7 @@
 library(ggplot2)
 library("psych")
 library("DescTools")
+library("e1071")
 
 airTrafficCargoStatistics <- read.csv('Air_Traffic_Cargo_Statistics.csv')
 
@@ -12,21 +13,25 @@ printDelimiterWithNewLines <- function () {
   cat("\n\n=========================================================================\n\n")
 }
 
+printEmptyLine <- function () {
+  cat("\n")
+}
+
 buildFrequencyPolygons <- function() {
   activityPeriod <- qplot(
-    airTrafficCargoStatistics$Activity.Period,
+    Activity.Period,
     data = airTrafficCargoStatistics,
     geom = 'freqpoly'
   )
   cargoWeightLBS <- qplot(
-    airTrafficCargoStatistics$Cargo.Weight.LBS,
+    Cargo.Weight.LBS,
     data = airTrafficCargoStatistics,
     geom = 'freqpoly'
   )
   cargoMetricTons <- qplot(
-    airTrafficCargoStatistics$Cargo.Metric.TONS,
+    Cargo.Metric.TONS,
     data = airTrafficCargoStatistics,
-    geom = 'freqpoly'
+    geom = 'freqpoly',
   )
   return(
     list(
@@ -40,11 +45,11 @@ buildFrequencyPolygons <- function() {
 bultWhiskersAndBoxes <- function() {
   activityPeriod <- ggplot(
     data = airTrafficCargoStatistics,
-    aes(y = airTrafficCargoStatistics$Activity.Period)
+    aes(y = Activity.Period)
   ) + geom_boxplot()
   cargoWeightLBS <- ggplot(
     data = airTrafficCargoStatistics,
-    aes(y = airTrafficCargoStatistics$Cargo.Weight.LBS)
+    aes(y =Cargo.Weight.LBS)
   ) +
     geom_boxplot() +
     scale_y_continuous(
@@ -54,7 +59,7 @@ bultWhiskersAndBoxes <- function() {
     )
   cargoMetricTons <- ggplot(
     data = airTrafficCargoStatistics,
-    aes(y = airTrafficCargoStatistics$Cargo.Metric.TONS)
+    aes(y = Cargo.Metric.TONS)
   ) +
     geom_boxplot() +
     scale_y_continuous(
@@ -71,34 +76,19 @@ bultWhiskersAndBoxes <- function() {
   )
 }
 
-printMinMaxMeanQuartils <- function () {
-  summary(
-    airTrafficCargoStatistics[
-      c('Activity.Period', 'Cargo.Weight.LBS', 'Cargo.Metric.TONS')
-    ]
-  )
+printSummary <- function (vector, name) {
+  summary <- summary(vector)
+  print(paste("Summary of '", name, "': "))
+  print(summary)
 }
 
-getDeciles <- function () {
-  activityPeriodDecils <- quantile(
-    airTrafficCargoStatistics$Activity.Period,
+printDeciles <- function (vector, name) {
+  deciles <- quantile(
+    vector,
     probs = seq(.1, .9, by = .1)
   )
-  cargoWeightLBSDecils <- quantile(
-    airTrafficCargoStatistics$Cargo.Weight.LBS,
-    probs = seq(.1, .9, by = .1)
-  )
-  cargoMetricWeightTonsDecils <- quantile(
-    airTrafficCargoStatistics$Cargo.Metric.TONS,
-    probs = seq(.1, .9, by = .1)
-  )
-  return(
-    list(
-      activityPeriodDecils = activityPeriodDecils,
-      cargoWeightLBSDecils = cargoWeightLBSDecils,
-      cargoMetricWeightTonsDecils = cargoMetricWeightTonsDecils
-    )
-  )
+  print(paste("Deciles of '", name, "': "))
+  print(deciles)
 }
 
 printGeometricalMeanWithoutZeroes <- function (vector, name) {
@@ -126,32 +116,112 @@ printMode <- function (vector, name) {
   )
 }
 
+printDispersion <- function (vector, name) {
+  dispersion <- var(vector)
+  print(
+    paste(
+      "Dispersion of '", name, "': ", dispersion
+    )
+  )
+}
+
+printStandardDeviation <- function (vector, name) {
+  sd <- sd(vector)
+  print(
+    paste(
+      "Standard Deviation of '", name, "': ", sd
+    )
+  )
+}
+
+printCoefficientOfVariation <- function (vector, name) {
+  cv <- sd(vector) / mean(vector) * 100
+  print(
+    paste(
+      "Coefficient of Variation of '", name, "': ", cv
+    )
+  )
+}
+
+printProbabilisticDeviation <- function (vector, name) {
+  pd <- IQR(vector) / 2
+  print(
+    paste(
+      "Probabilistic Deviation of '", name, "': ", pd
+    )
+  )
+}
+
+printSamplingSpan <- function (vector, name) {
+  max <- max(vector)
+  min <- min(vector)
+  print(
+    paste(
+      "Sampling Span of '", name, "': ", max - min
+    )
+  )
+}
+
+printConcentrationInterval <- function (vector, name) {
+  mean <- mean(vector)
+  sd <- sd(vector)
+  print(
+    paste(
+      "Concentration Interval of '", name, "': (", mean - 3 * sd, ", ", mean + 3 * sd, ")"
+    )
+  )
+}
+
+printKurtosis <- function (vector, name) {
+  print(
+    paste(
+      "Kurtosis of '", name, "': ", kurtosis(vector)
+    )
+  )
+}
+
+printSkewness <- function (vector, name) {
+  print(
+    paste(
+      "Skewness of '", name, "': ", skewness(vector)
+    )
+  )
+}
+
 buildFrequencyPolygons()
 bultWhiskersAndBoxes()
 
-printMinMaxMeanQuartils()
 printDelimiterWithNewLines()
 
-decils <- getDeciles()
-print("'Activity Period' Decils:")
-print(decils$activityPeriodDecils)
-print("'Cargo Weight LBS' Decils:")
-print(decils$cargoWeightLBSDecils)
-print("'Cargo Weight Tons' Decils:")
-print(decils$cargoMetricWeightTonsDecils)
-printDelimiterWithNewLines()
+analyze <- function (vector, vectorName) {
+  printSummary(vector, vectorName)
+  printEmptyLine()
+  printDeciles(vector, vectorName)
+  printEmptyLine()
+  printGeometricalMeanWithoutZeroes(vector, vectorName)
+  printEmptyLine()
+  printHarmonicMeanWithoutZeroes(vector, vectorName)
+  printEmptyLine()
+  printMode(vector, vectorName)
+  printEmptyLine()
+  printDispersion(vector, vectorName)
+  printEmptyLine()
+  printStandardDeviation(vector, vectorName)
+  printEmptyLine()
+  printCoefficientOfVariation(vector, vectorName)
+  printEmptyLine()
+  printProbabilisticDeviation(vector, vectorName)
+  printEmptyLine()
+  printSamplingSpan(vector, vectorName)
+  printEmptyLine()
+  printConcentrationInterval(vector, vectorName)
+  printEmptyLine()
+  printKurtosis(vector, vectorName)
+  printEmptyLine()
+  printSkewness(vector, vectorName)
+  printDelimiter()
+}
 
-printGeometricalMeanWithoutZeroes(airTrafficCargoStatistics$Activity.Period, "Activity Period")
-printHarmonicMeanWithoutZeroes(airTrafficCargoStatistics$Activity.Period, "Activity Period")
-printMode(airTrafficCargoStatistics$Activity.Period, "Activity Period")
-printDelimiter()
-
-printGeometricalMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
-printHarmonicMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
-printMode(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
-printDelimiter()
-
-printGeometricalMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
-printHarmonicMeanWithoutZeroes(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
-printMode(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
-printDelimiter()
+analyze(airTrafficCargoStatistics$Activity.Period, "Activity Period")
+analyze(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
+analyze(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
