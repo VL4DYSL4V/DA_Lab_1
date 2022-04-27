@@ -3,7 +3,7 @@ library("psych")
 library("DescTools")
 library("e1071")
 
-airTrafficCargoStatistics <- read.csv('Air_Traffic_Cargo_Statistics.csv')
+dataHospital <- read.csv('data_hospital.csv')
 
 printDelimiterWithNewLines <- function () {
   cat("\n\n=========================================================================\n\n")
@@ -14,38 +14,38 @@ printEmptyLine <- function () {
 }
 
 buildFrequencyPolygons <- function() {
-  activityPeriod <- qplot(
-    Activity.Period,
-    data = airTrafficCargoStatistics,
+  age <- qplot(
+    age,
+    data = dataHospital,
     geom = 'freqpoly'
   )
-  cargoWeightLBS <- qplot(
-    Cargo.Weight.LBS,
-    data = airTrafficCargoStatistics,
+  chol <- qplot(
+    chol,
+    data = dataHospital,
     geom = 'freqpoly'
   )
-  cargoMetricTons <- qplot(
-    Cargo.Metric.TONS,
-    data = airTrafficCargoStatistics,
+  trestbps <- qplot(
+    trestbps,
+    data = dataHospital,
     geom = 'freqpoly',
   )
   return(
     list(
-      activityPeriod = activityPeriod,
-      cargoWeightLBS = cargoWeightLBS,
-      cargoMetricTons = cargoMetricTons
+      age = age,
+      chol = chol,
+      trestbps = trestbps
     )
   )
 }
 
 bultWhiskersAndBoxes <- function() {
-  activityPeriod <- ggplot(
-    data = airTrafficCargoStatistics,
-    aes(y = Activity.Period)
+  age <- ggplot(
+    data = dataHospital,
+    aes(y = age)
   ) + geom_boxplot()
-  cargoWeightLBS <- ggplot(
-    data = airTrafficCargoStatistics,
-    aes(y =Cargo.Weight.LBS)
+  trestbps <- ggplot(
+    data = dataHospital,
+    aes(y = trestbps)
   ) +
     geom_boxplot() +
     scale_y_continuous(
@@ -53,9 +53,9 @@ bultWhiskersAndBoxes <- function() {
       breaks = trans_breaks("log2", function(x) 2^x),
       labels = trans_format("log2", math_format(2^.x))
     )
-  cargoMetricTons <- ggplot(
-    data = airTrafficCargoStatistics,
-    aes(y = Cargo.Metric.TONS)
+  chol <- ggplot(
+    data = dataHospital,
+    aes(y = chol)
   ) +
     geom_boxplot() +
     scale_y_continuous(
@@ -65,9 +65,9 @@ bultWhiskersAndBoxes <- function() {
     )
   return(
     list(
-      activityPeriod = activityPeriod,
-      cargoWeightLBS = cargoWeightLBS,
-      cargoMetricTons = cargoMetricTons
+      age = age,
+      trestbps = trestbps,
+      chol = chol
     )
   )
 }
@@ -218,6 +218,6 @@ analyze <- function (vector, vectorName) {
   printDelimiterWithNewLines()
 }
 
-analyze(airTrafficCargoStatistics$Activity.Period, "Activity Period")
-analyze(airTrafficCargoStatistics$Cargo.Weight.LBS, "Cargo Weight LBS")
-analyze(airTrafficCargoStatistics$Cargo.Metric.TONS, "Cargo Metric Tons")
+analyze(dataHospital$age, "Age")
+analyze(dataHospital$trestbps, "Resting blood pressure")
+analyze(dataHospital$chol, "Serum cholesterol")
