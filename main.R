@@ -5,10 +5,6 @@ library("e1071")
 
 airTrafficCargoStatistics <- read.csv('Air_Traffic_Cargo_Statistics.csv')
 
-printDelimiter <- function () {
-  cat("\n=========================================================================\n")
-}
-
 printDelimiterWithNewLines <- function () {
   cat("\n\n=========================================================================\n\n")
 }
@@ -219,7 +215,7 @@ analyze <- function (vector, vectorName) {
   printKurtosis(vector, vectorName)
   printEmptyLine()
   printSkewness(vector, vectorName)
-  printDelimiter()
+  printDelimiterWithNewLines()
 }
 
 analyze(airTrafficCargoStatistics$Activity.Period, "Activity Period")
